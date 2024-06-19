@@ -29,7 +29,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium pandas pyarrow
 
-    - name: Set up ChromeDriver
+    - name: Set up Chrome and ChromeDriver
       run: |
         sudo apt-get update
         sudo apt-get install -y wget unzip
@@ -37,8 +37,11 @@ jobs:
         sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
-        sudo apt-get install -y chromium-chromedriver
-        sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+        wget -N https://chromedriver.storage.googleapis.com/126.0.6478.61/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv -f chromedriver /usr/local/bin/chromedriver
+        sudo chmod +x /usr/local/bin/chromedriver
+        rm chromedriver_linux64.zip
 
     - name: Run the scraper
       run: python scraper.py
