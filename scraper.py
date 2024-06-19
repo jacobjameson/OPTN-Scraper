@@ -138,8 +138,8 @@ for donor_type in donor_types:
         
         all_data.append(df)
     
-    # Iterate over each option in the drop-down menu starting from the second option 
-    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options)):
+    # Iterate over each option in the drop-down menu starting from the second option len(Select(driver.find_element(By.ID, 'selectArea')).options)
+    for i in range(1, 2):
         # Reinitialize the select element and its options
         select_element = driver.find_element(By.ID, 'selectArea')
         select = Select(select_element)
