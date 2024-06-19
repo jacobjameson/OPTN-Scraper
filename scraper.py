@@ -184,8 +184,8 @@ def update_readme():
         lines = file.readlines()
     with open(readme_path, 'w') as file:
         for line in lines:
-            if line.startswith('Last updated:'):
-                line = f'Last updated: {now.strftime("%Y-%m-%d %H:%M:%S")}\n'
+            if line.startswith('The data was last collected:'):
+                line = f'The data was last collected: {now.strftime("%Y-%m-%d %H:%M:%S")}\n'
             file.write(line)
 
 update_readme()
