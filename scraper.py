@@ -138,8 +138,8 @@ for donor_type in donor_types:
         
         all_data.append(df)
     
-    # Iterate over each option in the drop-down menu starting from the second option len(Select(driver.find_element(By.ID, 'selectArea')).options)
-    for i in range(1, 2):
+    # Iterate over each option in the drop-down menu starting from the second option 
+    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options)):
         # Reinitialize the select element and its options
         select_element = driver.find_element(By.ID, 'selectArea')
         select = Select(select_element)
@@ -156,7 +156,7 @@ for donor_type in donor_types:
             cols[1] = 'Year'
             df.columns = cols
             df['Year'] = df['\xa0']
-            df = df.drop(columns=['\xa0'])
+            df = df.drop(columns(['\xa0']))
             df.insert(0, 'State', df.pop('State'))
             
             all_data.append(df)
@@ -165,7 +165,7 @@ for donor_type in donor_types:
     combined_df = pd.concat(all_data, ignore_index=True)
     combined_df = combined_df.fillna('0')
     
-
+    
     # Clean donor type name to use in the filename
     donor_type_clean = re.sub(r'\W+', '_', donor_type)
     
