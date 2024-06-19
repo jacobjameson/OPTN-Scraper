@@ -1,47 +1,37 @@
-name: Data Scraper
+name: Run Scraper
 
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * *'  # This will run every day at midnight
+    - cron: '0 8 * * *'  # Runs at 8 AM UTC daily
 
 jobs:
-  scrape:
+  build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
-
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y wget unzip
+        wget -N https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get -fy install
+        wget -N https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+        unzip -o chromedriver_linux64.zip
+        sudo mv -f chromedriver /usr/local/bin/chromedriver
+        sudo chmod +x /usr/local/bin/chromedriver
         python -m pip install --upgrade pip
         pip install selenium pandas pyarrow
 
-    - name: Set up Chrome and ChromeDriver
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y wget unzip
-        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-        sudo apt-get update
-        sudo apt-get install -y google-chrome-stable
-        wget -N https://chromedriver.storage.googleapis.com/126.0.6478.61/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv -f chromedriver /usr/local/bin/chromedriver
-        sudo chmod +x /usr/local/bin/chromedriver
-        rm chromedriver_linux64.zip
-
-    - name: Run the scraper
+    - name: Run scraper
       run: python scraper.py
