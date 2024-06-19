@@ -6,18 +6,22 @@ import pandas as pd
 import time
 import re
 
-# Set up Chrome options
-options = webdriver.ChromeOptions()
-options.add_argument('--headless')
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
-
-# Initialize the WebDriver for Chrome
-driver = webdriver.Chrome(options=options)
+# Initialize the WebDriver for Safari
+driver = webdriver.Safari()
 
 # Define the list of donor types
 donor_types = [
-    'All Donors by Donor Type'
+    'All Donors by Donor Type',
+    'Deceased Donors by Donor Age',
+    'Deceased Donors by Donor Ethnicity',
+    'Deceased Donors by Donor Gender',
+    'Deceased Donors by Circumstance of Death',
+    'Deceased Donors by Mechanism of Death',
+    'Deceased Donors by Cause of Death',
+    'Deceased Donors by DSA',
+    'Living Donors by Donor Age',
+    'Living Donors by Donor Ethnicity',
+    'Living Donors by Donor Gender',
 ]
 
 # Function to select a state and navigate through the steps
@@ -131,7 +135,7 @@ for donor_type in donor_types:
         all_data.append(df)
     
     # Iterate over each option in the drop-down menu starting from the second option 
-    for i in range(1, 2):
+    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options)):
         # Reinitialize the select element and its options
         select_element = driver.find_element(By.ID, 'selectArea')
         select = Select(select_element)
@@ -149,7 +153,7 @@ for donor_type in donor_types:
             cols[1] = 'Year'
             df.columns = cols
             df['Year'] = df['\xa0']
-            df = df.drop(columns(['\xa0']))
+            df = df.drop(columns=['\xa0'])
             df.insert(0, 'State', df.pop('State'))
             
             all_data.append(df)
@@ -168,3 +172,17 @@ for donor_type in donor_types:
 
 # Close the WebDriver
 driver.quit()
+
+def update_readme():
+    import datetime
+    now = datetime.datetime.now()
+    readme_path = 'README.md'
+    with open(readme_path, 'r') as file:
+        lines = file.readlines()
+    with open(readme_path, 'w') as file:
+        for line in lines:
+            if line.startswith('Last updated:'):
+                line = f'Last updated: {now.strftime("%Y-%m-%d %H:%M:%S")}\n'
+            file.write(line)
+
+update_readme()
