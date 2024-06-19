@@ -32,8 +32,8 @@ jobs:
     - name: Set up ChromeDriver
       run: |
         sudo apt-get update
-        sudo apt-get install -y chromium-chromedriver
-        sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+        sudo apt-get install -y chromium-browser chromium-chromedriver
+        if [ ! -f /usr/bin/chromedriver ]; then sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver; fi
 
     - name: Run the scraper
       run: python scraper.py
