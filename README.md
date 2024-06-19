@@ -2,22 +2,6 @@
 
 This repository contains a Python script to scrape state-level organ transplant data from the OPTN website and store the results in parquet files. The script is set to run automatically every day using GitHub Actions.
 
-## How to Use
-
-1. Clone the repository.
-2. Install the required dependencies:
-
-```
-pip install -r requirements.txt
-```
-3. Run the scraper manually:
-
-```
-python scraper.py
-```
-
-
-The results will be saved in `state_transplant_data_combined.csv`.
 
 ## Automated Updates
 
