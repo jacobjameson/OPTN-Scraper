@@ -6,26 +6,18 @@ import pandas as pd
 import time
 import re
 
-# Initialize the WebDriver for headless Chrome
+# Set up Chrome options
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
+options.add_argument('--headless')
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
+# Initialize the WebDriver for Chrome
 driver = webdriver.Chrome(options=options)
 
 # Define the list of donor types
 donor_types = [
-    'All Donors by Donor Type',
-    'Deceased Donors by Donor Age',
-    'Deceased Donors by Donor Ethnicity',
-    'Deceased Donors by Donor Gender',
-    'Deceased Donors by Circumstance of Death',
-    'Deceased Donors by Mechanism of Death',
-    'Deceased Donors by Cause of Death',
-    'Deceased Donors by DSA',
-    'Living Donors by Donor Age',
-    'Living Donors by Donor Ethnicity',
-    'Living Donors by Donor Gender',
+    'All Donors by Donor Type'
 ]
 
 # Function to select a state and navigate through the steps
@@ -151,6 +143,7 @@ for donor_type in donor_types:
         print(f'Selecting {state_name} for {donor_type}...')
         df = select_state_and_navigate(state_value, state_name, donor_type)
 
+
         if df is not None:
             cols = df.columns.tolist()
             cols[1] = 'Year'
@@ -164,7 +157,6 @@ for donor_type in donor_types:
     # Combine all DataFrames for the donor type into a single DataFrame
     combined_df = pd.concat(all_data, ignore_index=True)
     combined_df = combined_df.fillna('0')
-    
     
     # Clean donor type name to use in the filename
     donor_type_clean = re.sub(r'\W+', '_', donor_type)
