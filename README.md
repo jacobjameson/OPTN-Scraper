@@ -1,6 +1,6 @@
 # OPTN Data Scraper
 
-This repository contains a Python script to scrape organ transplant data from the OPTN website and store the results in a CSV file. The script is set to run automatically every day using GitHub Actions.
+This repository contains a Python script to scrape state-level organ transplant data from the OPTN website and store the results in parquet files. The script is set to run automatically every day using GitHub Actions.
 
 ## How to Use
 
