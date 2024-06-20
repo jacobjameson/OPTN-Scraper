@@ -6,6 +6,6 @@ This repository contains a Python script to scrape state-level organ transplant 
 
 Data is sourced from the [OPTN website](https://optn.transplant.hrsa.gov/data/view-data-reports/state-data/).
 
-The data was last collected: 
+The data was last collected: 2024-06-20 18:30:09
 
 
