@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -6,11 +7,17 @@ import pandas as pd
 import time
 import re
 
-# Initialize the WebDriver for Safari
-driver = webdriver.Safari()
+# Set up Chrome options for headless operation
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 
-# Maximize the window
-driver.maximize_window()
+# Initialize the WebDriver for Chrome
+driver = webdriver.Chrome(options=chrome_options)
+
+# Maximize the window (this might not be necessary in headless mode, but included for completeness)
+driver.set_window_size(1920, 1080)
 
 # Define the list of donor types
 donor_types = [
@@ -138,7 +145,7 @@ for donor_type in donor_types:
         all_data.append(df)
     
     # Iterate over each option in the drop-down menu starting from the second option 
-    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options):
+    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options)):
         # Reinitialize the select element and its options
         select_element = driver.find_element(By.ID, 'selectArea')
         select = Select(select_element)
@@ -149,7 +156,6 @@ for donor_type in donor_types:
         
         print(f'Selecting {state_name} for {donor_type}...')
         df = select_state_and_navigate(state_value, state_name, donor_type)
-
 
         if df is not None:
             cols = df.columns.tolist()
