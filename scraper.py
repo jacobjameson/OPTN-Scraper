@@ -26,13 +26,13 @@ driver.set_window_size(1920, 1080)
 donor_types = [
     'All Donors by Donor Type',
     'Deceased Donors by Donor Age',
-    'Deceased Donors by Donor Ethnicity',
-    'Deceased Donors by Donor Gender',
-    'Deceased Donors by Circumstance of Death',
-    'Deceased Donors by Mechanism of Death',
-    'Deceased Donors by Cause of Death',
-    'Deceased Donors by DSA',
-    'Living Donors by Donor Age',
+   # 'Deceased Donors by Donor Ethnicity',
+   # 'Deceased Donors by Donor Gender',
+   # 'Deceased Donors by Circumstance of Death',
+   # 'Deceased Donors by Mechanism of Death',
+   # 'Deceased Donors by Cause of Death',
+   # 'Deceased Donors by DSA',
+   # 'Living Donors by Donor Age',
     'Living Donors by Donor Ethnicity',
     'Living Donors by Donor Gender',
 ]
@@ -147,8 +147,8 @@ for donor_type in donor_types:
         
         all_data.append(df)
     
-    # Iterate over each option in the drop-down menu starting from the second option 
-    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options)):
+    # Iterate over each option in the drop-down menu starting from the second option len(Select(driver.find_element(By.ID, 'selectArea')).options)
+    for i in range(1, 3):
         # Reinitialize the select element and its options
         select_element = driver.find_element(By.ID, 'selectArea')
         select = Select(select_element)
