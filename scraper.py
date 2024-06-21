@@ -184,13 +184,25 @@ for donor_type in donor_types:
 
 
 # Zip all files in data/kidney
-
 zip_filename = f"kidney_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
-with zipfile.ZipFile(zip_filename, 'w') as zipf:
+zip_filepath = os.path.join('data', 'kidney', zip_filename)
+
+with zipfile.ZipFile(zip_filepath, 'w') as zipf:
     for root, dirs, files in os.walk('data/kidney'):
         for file in files:
-            zipf.write(os.path.join(root, file), 
-                       os.path.relpath(os.path.join(root, file), 'data/kidney'))
+            if file.endswith('.parquet'):
+                file_path = os.path.join(root, file)
+                zipf.write(file_path, file)
+
+print(f"All .parquet files in data/kidney have been zipped to {zip_filepath}")
+
+# Delete all .parquet files
+for root, dirs, files in os.walk('data/kidney'):
+    for file in files:
+        if file.endswith('.parquet'):
+            os.remove(os.path.join(root, file))
+
+print("All .parquet files in data/kidney have been deleted")
 
 print(f"All files in data/kidney have been zipped to {zip_filename}")
 # Close the WebDriver
