@@ -6,8 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 import re
-import zipfile
 import os
+import sys
 from datetime import datetime
 
 # Set up Chrome options for headless operation
@@ -19,25 +19,24 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 # Initialize the WebDriver for Chrome
 driver = webdriver.Chrome(options=chrome_options)
 
-# Maximize the window (this might not be necessary in headless mode, but included for completeness)
+# Maximize the window
 driver.set_window_size(1920, 1080)
 
 # Define the list of donor types
 donor_types = [
     'All Donors by Donor Type',
     'Deceased Donors by Donor Age',
-   # 'Deceased Donors by Donor Ethnicity',
-   # 'Deceased Donors by Donor Gender',
-   # 'Deceased Donors by Circumstance of Death',
-   # 'Deceased Donors by Mechanism of Death',
-   # 'Deceased Donors by Cause of Death',
-   # 'Deceased Donors by DSA',
-   # 'Living Donors by Donor Age',
+    'Deceased Donors by Donor Ethnicity',
+    'Deceased Donors by Donor Gender',
+    'Deceased Donors by Circumstance of Death',
+    'Deceased Donors by Mechanism of Death',
+    'Deceased Donors by Cause of Death',
+    'Deceased Donors by DSA',
+    'Living Donors by Donor Age',
     'Living Donors by Donor Ethnicity',
     'Living Donors by Donor Gender',
 ]
 
-# Function to select a state and navigate through the steps
 def select_state_and_navigate(state_value=None, state_name=None, donor_type=None):
     try:
         if state_value:
@@ -123,14 +122,18 @@ def select_state_and_navigate(state_value=None, state_name=None, donor_type=None
         driver.get('https://optn.transplant.hrsa.gov/data/view-data-reports/state-data/')
         time.sleep(2)
 
-# Open the website
-driver.get('https://optn.transplant.hrsa.gov/data/view-data-reports/state-data/')
+def update_readme():
+    now = datetime.now()
+    readme_path = 'README.md'
+    with open(readme_path, 'r') as file:
+        lines = file.readlines()
+    with open(readme_path, 'w') as file:
+        for line in lines:
+            if line.startswith('The data was last collected:'):
+                line = f'The data was last collected: {now.strftime("%Y-%m-%d %H:%M:%S")}\n'
+            file.write(line)
 
-# Wait for the page to load
-time.sleep(2)
-
-# Process each donor type
-for donor_type in donor_types:
+def process_donor_type(donor_type):
     all_data = []
     print(f"Processing donor type: {donor_type}")
     
@@ -147,9 +150,8 @@ for donor_type in donor_types:
         
         all_data.append(df)
     
-    # Iterate over each option in the drop-down menu starting from the second option len(Select(driver.find_element(By.ID, 'selectArea')).options)
-    for i in range(1, 3):
-        # Reinitialize the select element and its options
+    # Iterate over each option in the drop-down menu starting from the second option
+    for i in range(1, len(Select(driver.find_element(By.ID, 'selectArea')).options)):
         select_element = driver.find_element(By.ID, 'selectArea')
         select = Select(select_element)
         option = select.options[i]
@@ -178,46 +180,30 @@ for donor_type in donor_types:
     donor_type_clean = re.sub(r'\W+', '_', donor_type)
     
     # Save the combined DataFrame to a Parquet file
+    os.makedirs('data/kidney', exist_ok=True)
     combined_file_path = f'data/kidney/{donor_type_clean}.parquet'
     combined_df.to_parquet(combined_file_path, index=False)
     print(f"Saved data for {donor_type} to {combined_file_path}")
 
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python scraper.py <donor_type>")
+        sys.exit(1)
 
-# Zip all files in data/kidney
-zip_filename = f"kidney_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
-zip_filepath = os.path.join('data', 'kidney', zip_filename)
+    donor_type = sys.argv[1]
+    if donor_type not in donor_types:
+        print(f"Invalid donor type. Choose from: {', '.join(donor_types)}")
+        sys.exit(1)
 
-with zipfile.ZipFile(zip_filepath, 'w') as zipf:
-    for root, dirs, files in os.walk('data/kidney'):
-        for file in files:
-            if file.endswith('.parquet'):
-                file_path = os.path.join(root, file)
-                zipf.write(file_path, file)
+    # Open the website
+    driver.get('https://optn.transplant.hrsa.gov/data/view-data-reports/state-data/')
 
-print(f"All .parquet files in data/kidney have been zipped to {zip_filepath}")
+    # Wait for the page to load
+    time.sleep(2)
 
-# Delete all .parquet files
-for root, dirs, files in os.walk('data/kidney'):
-    for file in files:
-        if file.endswith('.parquet'):
-            os.remove(os.path.join(root, file))
+    process_donor_type(donor_type)
 
-print("All .parquet files in data/kidney have been deleted")
+    # Close the WebDriver
+    driver.quit()
 
-print(f"All files in data/kidney have been zipped to {zip_filename}")
-# Close the WebDriver
-driver.quit()
-
-def update_readme():
-    import datetime
-    now = datetime.datetime.now()
-    readme_path = 'README.md'
-    with open(readme_path, 'r') as file:
-        lines = file.readlines()
-    with open(readme_path, 'w') as file:
-        for line in lines:
-            if line.startswith('The data was last collected:'):
-                line = f'The data was last collected: {now.strftime("%Y-%m-%d %H:%M:%S")}\n'
-            file.write(line)
-
-update_readme()
+    update_readme()
