@@ -179,6 +179,20 @@ for donor_type in donor_types:
     combined_df.to_parquet(combined_file_path, index=False)
     print(f"Saved data for {donor_type} to {combined_file_path}")
 
+
+# Zip all files in data/kidney
+import zipfile
+import os
+from datetime import datetime
+
+zip_filename = f"kidney_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+with zipfile.ZipFile(zip_filename, 'w') as zipf:
+    for root, dirs, files in os.walk('data/kidney'):
+        for file in files:
+            zipf.write(os.path.join(root, file), 
+                       os.path.relpath(os.path.join(root, file), 'data/kidney'))
+
+print(f"All files in data/kidney have been zipped to {zip_filename}")
 # Close the WebDriver
 driver.quit()
 
