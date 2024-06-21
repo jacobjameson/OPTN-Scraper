@@ -6,6 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 import re
+import zipfile
+import os
+from datetime import datetime
 
 # Set up Chrome options for headless operation
 chrome_options = Options()
@@ -181,9 +184,6 @@ for donor_type in donor_types:
 
 
 # Zip all files in data/kidney
-import zipfile
-import os
-from datetime import datetime
 
 zip_filename = f"kidney_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
 with zipfile.ZipFile(zip_filename, 'w') as zipf:
