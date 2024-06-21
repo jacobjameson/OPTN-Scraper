@@ -7,7 +7,22 @@ on:
 
 jobs:
   scrape:
-    runs-on: macos-latest  # Using macOS runner for Safari WebDriver
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        donor_type: [
+          'All Donors by Donor Type',
+          'Deceased Donors by Donor Age',
+          'Deceased Donors by Donor Ethnicity',
+          'Deceased Donors by Donor Gender',
+          'Deceased Donors by Circumstance of Death',
+          'Deceased Donors by Mechanism of Death',
+          'Deceased Donors by Cause of Death',
+          'Deceased Donors by DSA',
+          'Living Donors by Donor Age',
+          'Living Donors by Donor Ethnicity',
+          'Living Donors by Donor Gender'
+        ]
     steps:
     - uses: actions/checkout@v2
     
@@ -16,17 +31,31 @@ jobs:
       with:
         python-version: '3.x'
     
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+    
+    - name: Install ChromeDriver
+      run: |
+        CHROME_VERSION=$(google-chrome --version | cut -d ' ' -f3 | cut -d '.' -f1)
+        CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+        curl -L -o chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+        unzip chromedriver.zip
+        chmod +x chromedriver
+        sudo mv chromedriver /usr/local/bin/
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Run scraper
-      run: python scraper.py
+    - name: Run scraper for ${{ matrix.donor_type }}
+      run: python scraper.py "${{ matrix.donor_type }}"
     
-    - name: Commit and push if changes
+    - name: Commit and push changes
       run: |
         git config --global user.name 'GitHub Action'
         git config --global user.email 'action@github.com'
         git add -A
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update data $(date +'%Y-%m-%d')" && git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git)
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update data for ${{ matrix.donor_type }} $(date +'%Y-%m-%d')" && git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git)
