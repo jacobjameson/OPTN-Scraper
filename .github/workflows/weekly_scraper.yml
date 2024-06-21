@@ -44,4 +44,8 @@ jobs:
         git config --global user.name 'GitHub Action'
         git config --global user.email 'action@github.com'
         git add -A
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update data for ${{ matrix.donor_type }} $(date +'%Y-%m-%d')" && git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git)
+        git diff --quiet && git diff --staged --quiet || (
+          git pull --rebase
+          git commit -m "Update data for ${{ matrix.donor_type }} $(date +'%Y-%m-%d')"
+          git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+        )
