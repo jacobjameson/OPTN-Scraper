@@ -4,7 +4,7 @@ This repository contains a Python script that automatically scrapes kidney trans
 
 Data is sourced from the [OPTN website](https://optn.transplant.hrsa.gov/data/view-data-reports/state-data/).
 
-The data was last collected: 2024-06-21 16:18:18
+The data was last collected: 2024-06-21 16:35:56
 
 ## Overview
 
